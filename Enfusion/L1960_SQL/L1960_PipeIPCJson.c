@@ -1,5 +1,8 @@
 class L1960_SQLQuery : array<ref L1960_GenericJson>
 {
+	string m_sError;  // error from the DB 
+	string m_sQuery;  // query which was requested
+	
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	//--- Public functions
 	////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -8,7 +11,7 @@ class L1960_SQLQuery : array<ref L1960_GenericJson>
 	Parses the SQL query result into a L1960_PipeIPCJson object.
 	\param result Json object containing 3 string lists: data, names, types. Where names and types must be the same length and data must be a multiple.
 	*/
-	void L1960_SQLQuery(string result = "{\"data\":[], \"types\":[], \"names\":[]}}")
+	void L1960_SQLQuery(string result = "{\"data\":[], \"types\":[], \"names\":[], \"error\":\" \", \"query\":\" \"}")
 	{
 		L1960_PipeIPCJson jas = new L1960_PipeIPCJson(this);		
 		jas.ExpandFromRAW(result);
@@ -35,7 +38,10 @@ class L1960_PipeIPCJson : JsonApiStruct
 	protected ref array<string> names;  // names of the SQL columns 
 	protected ref array<string> types;  // types of the SQL columns 
 	
-	array<ref L1960_GenericJson> content;  // SQL query parsed as rows of L1960_GenericJson
+	protected string error;  // error from the DB 
+	protected string query;  // query which was requested
+	
+	L1960_SQLQuery content;  // SQL query parsed as rows of L1960_GenericJson
 
 	/*!
 	Called after successful parsing of the Json
@@ -43,6 +49,9 @@ class L1960_PipeIPCJson : JsonApiStruct
 	*/
 	override void OnSuccess( int errorCode )
 	{
+		content.m_sError = error;
+		content.m_sQuery = query;
+		
 		if (names && types)
 		{
 			for (int i = 0; i < data.Count();)
@@ -85,11 +94,14 @@ class L1960_PipeIPCJson : JsonApiStruct
 	data, names and types are parse automatically from the Json data.
 	\param c the L1960_GenericJson list for the output
 	*/
-	void L1960_PipeIPCJson(array<ref L1960_GenericJson> c)
+	void L1960_PipeIPCJson(L1960_SQLQuery c)
 	{
 		RegV("data");
 		RegV("names");
 		RegV("types");
+		
+		RegV("error");
+		RegV("query");
 		
 		content = c;
 	}	
