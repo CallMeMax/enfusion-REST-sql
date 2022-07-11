@@ -10,11 +10,11 @@ Arma must have access to the Webserver - either via localhost or publicly in the
 ## Usage
 You can perform synchronous:
 
-    L1960_SQLREST.Query(0,"SELECT CURRENT_TIMESTAMP() as time")
+    L1960_SQL.Query(0,"SELECT CURRENT_TIMESTAMP() as time")
 
 and asynchronous queries:
 
-    auto tmp = new L1960_SQLREST();
+    auto tmp = new L1960_SQL();
     tmp.Insert(func);  // receive the result in the func function which takes a L1960_SQLQuery object
     tmp.Query_async(sql); 
     
